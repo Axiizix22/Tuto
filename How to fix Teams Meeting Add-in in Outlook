@@ -1,0 +1,23 @@
+How to fix the Teams Meeting Add-in in Outlook with the new Teams :
+
+1. Create the following registry keys:
+
+New-Item -Path “HKLM:\Software\Microsoft\Office\Outlook\Addins” -Name “TeamsAddin.FastConnect” -Force -ErrorAction Ignore
+New-ItemProperty -Path “HKLM:\Software\Microsoft\Office\Outlook\Addins\TeamsAddin.FastConnect” -Type “DWord” -Name “LoadBehavior” -Value 3 -force
+New-ItemProperty -Path “HKLM:\Software\Microsoft\Office\Outlook\Addins\TeamsAddin.FastConnect” -Type “String” -Name “Description” -Value “Microsoft Teams Meeting Add-in for Microsoft Office” -force
+New-ItemProperty -Path “HKLM:\Software\Microsoft\Office\Outlook\Addins\TeamsAddin.FastConnect” -Type “String” -Name “FriendlyName” -Value “Microsoft Teams Meeting Add-in for Microsoft Office” -force
+
+2. Reinstall the ‘Teams Meeting Add-in’ in “C:\Program Files (x86)\Microsoft\TeamsMeetingAddin\” for everyone
+ (You can find the program in “C:\Program Files\WindowsApps\MSTeams_24277.3507.3205.5228_x64__8wekyb3d8bbwe”)
+
+3. Execute this PowerShell script (can be executed via GPO) :
+
+# Define the necessary file paths. 
+$regsvr32Path = "C:\Windows\System32\regsvr32.exe" 
+$dllPath = "C:\Program Files (x86)\Microsoft\TeamsMeetingAddin\1.24.25702.0\x64\Microsoft.Teams.AddinLoader.dll" 
+# Run the command to register the DLL. 
+Start-Process -FilePath $regsvr32Path -ArgumentList "/n /s /i:user `"$dllPath`"" -NoNewWindow -Wait 
+Write-Output "DLL successfully registered."
+
+4. Launch Teams and Outlook then restart Outlook
+
